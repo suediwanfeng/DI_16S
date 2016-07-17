@@ -1,0 +1,34 @@
+
+
+Since the data is very small, I just show a demo plot here, which to demonstrate the user's activity
+and sleep quality by month among the calender year.
+```{r}
+### format the data by monthly segmentations
+df<-read.csv('OneYearFitBitDataSleep.csv')
+month<-apply(df,1,function(x) paste(substr(toString(x),7,10),'-',substr(toString(x),4,5),sep=''))
+monthly_sleep<-cbind(month,df)
+
+df<-read.csv('OneYearFitBitData.csv')
+month<-apply(df,1,function(x) paste(substr(toString(x),7,10),'-',substr(toString(x),4,5),sep=''))
+monthly_activity<-cbind(month,df)
+
+```
+From the plots we can have a general insight about the user's calories burned in the past year.
+In winter, the user tends to have less walking or sporting than during summer. 
+```{r}
+f<-aggregate(Calorie.bruciate~month,monthly_activity,mean)
+plot(f)
+```
+Similarly, we can check the user's sleeping quality during the past year. Given limited columns,
+we could define the quality of sleep as the ratio of actual sleeping time and rest time (sleeping+awake),
+with non-sense date filtered out. From the plot we can see the user's sleep quality improves during the last year,
+however recently drops a little bit in summer 2016, with more information given, we would like to explore
+the potential factors involved in sleep regulation.
+```{r}
+m<-monthly_sleep
+f<-cbind(m[,c(1,2)],m[,3]/m[,6])
+colnames(f)[3]<-"quality"
+f<-f[(!is.na(f[,3])),]
+f<-aggregate(quality~month,f,mean)
+plot(f)
+```
